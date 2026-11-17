@@ -152,8 +152,6 @@ Cómo validé el código:
 - Probé la importación contra SWAPI real con casos especiales (Luke, Jabba con masa `"1,358"`, C-3PO con género `n/a`, el ID 17 que da 404) y simulé un timeout.
 - Verifiqué las validaciones enviando datos inválidos.
 
-[Ajustar con tu experiencia real.]
-
 ### 7. Mejoras futuras
 - Pruebas automatizadas (Feature tests del CRUD y de la importación con `Http::fake()`).
 - Búsqueda por nombre, filtro por género y ordenamiento de la tabla.
