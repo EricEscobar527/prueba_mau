@@ -1,58 +1,168 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistema de Gestión de Personajes Star Wars
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Información del Candidato
+Nombre: [Tu nombre completo]
+Email: [Tu email]
+Teléfono: [Tu teléfono]
 
-## About Laravel
+## Requisitos del Sistema
+- PHP 8.3+ (Laravel 13 lo requiere)
+- Composer
+- Node.js 20+
+- MySQL 8+
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+O bien, solo **Docker Desktop** si se usa la instalación con Docker.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Instalación
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Opción A: con Docker (recomendada)
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
-
-```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+1. Clonar repositorio
+```
+git clone https://github.com/EricEscobar527/prueba_mau.git
+cd prueba_mau
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+2. Crear el archivo de entorno (Docker Compose toma de aquí los datos de MySQL)
+```
+cp .env.example .env
+```
 
-## Contributing
+3. Levantar los contenedores
+```
+docker compose up --build -d
+```
+Al iniciar, el contenedor `app` ejecuta automáticamente `composer install`, `npm install`, `npm run build`, `php artisan key:generate` y `php artisan migrate` (ver `docker/start.sh`). La primera vez tarda unos minutos.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+4. Acceder
+http://localhost:8000/personajes
 
-## Code of Conduct
+MySQL queda expuesto en el puerto `3307` de la máquina (usuario `root`, contraseña `root`).
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### Opción B: instalación local
 
-## Security Vulnerabilities
+1. Clonar repositorio
+```
+git clone https://github.com/EricEscobar527/prueba_mau.git
+cd prueba_mau
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+2. Instalar dependencias
+```
+composer install
+npm install
+```
 
-## License
+3. Configurar base de datos
+```
+cp .env.example .env
+```
+Editar `.env` con las credenciales de MySQL. **Cambiar `DB_HOST=mysql` por `DB_HOST=127.0.0.1`** (el valor `mysql` es el nombre del servicio en Docker).
+```
+php artisan key:generate
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+4. Ejecutar migraciones
+```
+php artisan migrate
+```
+
+5. Compilar assets
+```
+npm run build
+```
+
+6. Iniciar servidor
+```
+php artisan serve
+```
+
+7. Acceder
+http://localhost:8000/personajes
+
+## Funcionalidades Implementadas
+
+Obligatorias:
+- CRUD completo de personajes
+- Integración con SWAPI
+- Validaciones backend y frontend
+- Paginación
+- Componentes Vue reutilizables
+- Diseño responsive
+
+Bonus:
+- Service Layer para la integración con SWAPI (`app/Services/SwapiService.php`)
+- Docker Compose funcional
+
+## Tecnologías
+- Laravel 13.x
+- Vue.js 3.x
+- Inertia.js 3.x
+- Tailwind CSS 4.x
+- MySQL 8
+- Vite
+
+## Notas
+- **Mapeo de género:** SWAPI tiene valores además de `male`, `female` y `n/a` (por ejemplo `hermaphrodite` en Jabba o `none`). `male` → `masculino`, `female` → `femenino` y cualquier otro valor → `n/a`.
+- **Altura y masa:** SWAPI regresa estos campos como texto. Se quitan las comas (`"1,358"` → `1358`) y los valores no numéricos como `"unknown"` se guardan como `null`.
+- **Planeta de origen:** SWAPI regresa `homeworld` como URL, así que se hace una segunda consulta para obtener el nombre del planeta. Si esa consulta falla, el personaje se importa igual con `planeta_origen` en `null`.
+- **ID 17:** aunque el rango es 1–83, SWAPI no tiene personaje con ID 17 (responde 404). La aplicación muestra el mensaje "No existe un personaje con el ID 17 en SWAPI."
+- **Personajes importados con valores fuera de rango:** las validaciones (masa máx. 500) aplican a la captura manual. Jabba (ID 16) se importa con masa 1358, así que para editarlo hay que ajustar la masa a un valor válido.
+
+---
+
+## Preguntas Técnicas
+
+### 1. Organización del código backend
+- **Controller (`PersonajeController`):** solo coordina: recibe la petición, llama al modelo o al servicio y regresa la vista de Inertia o una redirección con mensaje.
+- **Form Requests (`PersonajeRequest`, `ImportarPersonajeRequest`):** contienen las reglas de validación y los mensajes en español, para que el controlador no tenga lógica de validación.
+- **Service (`SwapiService`):** toda la comunicación con SWAPI (consulta HTTP, manejo de errores y transformación de campos de inglés a español) está separada del controlador. Si mañana cambia la API, solo se modifica este archivo.
+- **Excepción propia (`SwapiException`):** el servicio lanza esta excepción con un mensaje claro y el controlador la convierte en un error de formulario.
+- **Modelo (`Personaje`):** `$fillable`, `$casts` y la constante `GENEROS` que se usa en la validación.
+
+### 2. Componentes Vue
+- **`PersonajeForm.vue`:** el formulario completo con sus validaciones y errores. Lo usan las páginas Crear y Editar; solo cambian las props (`personaje`, `url`, `metodo`, `textoBoton`).
+- **`ImportarModal.vue`:** el modal de importación con su propio `useForm`, estado de carga y errores. Se controla con la prop `abierto` y el evento `cerrar`, así que se puede poner en cualquier página.
+- **`Paginacion.vue`:** recibe cualquier paginador de Laravel y dibuja los enlaces; sirve para cualquier listado.
+- **`MensajeFlash.vue`:** muestra los mensajes de éxito/error compartidos desde el middleware de Inertia.
+- **`Spinner.vue`:** indicador de carga que se usa en botones del formulario, del modal y de eliminar.
+
+### 3. Manejo de errores de SWAPI
+En `SwapiService`:
+- **Timeout / API caída:** la petición tiene `timeout(10)`. Si no hay conexión o se agota el tiempo, Laravel lanza `ConnectionException`, que se convierte en `SwapiException` con el mensaje "No se pudo conectar con SWAPI".
+- **ID inexistente (404):** se detecta con `$respuesta->notFound()` y se muestra "No existe un personaje con el ID X en SWAPI".
+- **Otros errores (500, respuesta inválida):** si la respuesta falla o no trae `name`, se muestra "SWAPI respondió con un error".
+- **Antes de consultar la API**, `ImportarPersonajeRequest` valida que el ID sea entero, esté entre 1 y 83 y que no se haya importado antes (`unique` sobre `swapi_id`), así no se hacen peticiones innecesarias. Además, `swapi_id` tiene índice `unique` en la base de datos.
+
+En el controlador, la `SwapiException` se convierte en error del campo `swapi_id` (`back()->withErrors(...)`), así el mensaje aparece dentro del modal.
+
+### 4. Validaciones
+- **Backend (la fuente de verdad):** en Form Requests, porque mantienen el controlador limpio, se reutiliza la misma clase para crear y actualizar, y Laravel regresa los errores automáticamente a Inertia.
+- **Frontend (básica):** atributos HTML5 (`required`, `minlength`, `maxlength`, `min`, `max`) para dar respuesta inmediata sin ir al servidor. No se duplica la lógica en JavaScript; los errores del backend se muestran debajo de cada campo con `form.errors`.
+
+### 5. Mayor dificultad
+[Completar con tu experiencia. Ejemplos de lo que hubo que resolver: datos de SWAPI que no son numéricos (`"1,358"`, `"unknown"`), géneros fuera del mapeo, el ID 17 que no existe, o la lentitud de Docker en Windows al montar `vendor/` (se resolvió con volúmenes de Docker para `vendor` y `node_modules`).]
+
+### 6. Uso de Inteligencia Artificial
+Sí. Usé **Claude (Claude Code)** como asistente durante todo el proyecto: configuración de Docker, instalación de Inertia/Vue, y generación del backend (migración, controlador, Form Requests, servicio de SWAPI) y del frontend (páginas y componentes).
+
+Cómo validé el código:
+- Revisé cada archivo para entender qué hace antes de hacer commit.
+- Probé manualmente en el navegador todo el flujo: crear, editar, eliminar, paginación e importación.
+- Probé la importación contra SWAPI real con casos especiales (Luke, Jabba con masa `"1,358"`, C-3PO con género `n/a`, el ID 17 que da 404) y simulé un timeout.
+- Verifiqué las validaciones enviando datos inválidos.
+
+[Ajustar con tu experiencia real.]
+
+### 7. Mejoras futuras
+- Pruebas automatizadas (Feature tests del CRUD y de la importación con `Http::fake()`).
+- Búsqueda por nombre, filtro por género y ordenamiento de la tabla.
+- Comando Artisan para importar varios personajes a la vez.
+- Soft deletes.
+- Cachear la consulta del planeta para no repetirla.
+
+### 8. Autoevaluación
+[Tu calificación del 1 al 10 y qué consideras lo mejor de tu implementación.]
+
+### 9. Tiempo invertido
+[X horas]
