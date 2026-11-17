@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\SwapiException;
+use App\Http\Requests\ImportarPersonajeRequest;
 use App\Http\Requests\PersonajeRequest;
 use App\Models\Personaje;
+use App\Services\SwapiService;
 use Illuminate\Http\RedirectResponse;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -50,5 +53,17 @@ class PersonajeController extends Controller
         $personaje->delete();
 
         return back()->with('success', 'Personaje eliminado correctamente.');
+    }
+
+    public function importar(ImportarPersonajeRequest $request, SwapiService $swapiService): RedirectResponse
+    {
+        try {
+            $personaje = $swapiService->importarPersonaje($request->integer('swapi_id'));
+        } catch (SwapiException $exception) {
+            return back()->withErrors(['swapi_id' => $exception->getMessage()]);
+        }
+
+        return redirect()->route('personajes.index')
+            ->with('success', "Personaje {$personaje->nombre} importado correctamente.");
     }
 }
