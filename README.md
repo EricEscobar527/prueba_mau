@@ -1,9 +1,9 @@
 # Sistema de Gestión de Personajes Star Wars
 
 ## Información del Candidato
-Nombre: [Tu nombre completo]
-Email: [Tu email]
-Teléfono: [Tu teléfono]
+Nombre: Eric Antonio Escobar Colin
+Email: e888953@gmail.com
+Teléfono: 5510914253
 
 ## Requisitos del Sistema
 - PHP 8.3+ (Laravel 13 lo requiere)
@@ -141,16 +141,20 @@ En el controlador, la `SwapiException` se convierte en error del campo `swapi_id
 - **Frontend (básica):** atributos HTML5 (`required`, `minlength`, `maxlength`, `min`, `max`) para dar respuesta inmediata sin ir al servidor. No se duplica la lógica en JavaScript; los errores del backend se muestran debajo de cada campo con `form.errors`.
 
 ### 5. Mayor dificultad
-[Completar con tu experiencia. Ejemplos de lo que hubo que resolver: datos de SWAPI que no son numéricos (`"1,358"`, `"unknown"`), géneros fuera del mapeo, el ID 17 que no existe, o la lentitud de Docker en Windows al montar `vendor/` (se resolvió con volúmenes de Docker para `vendor` y `node_modules`).]
+Lo más difícil fue la integración con SWAPI, porque los datos no siempre vienen como se espera:
+- La masa de Jabba viene como `"1,358"` (con coma) y varios personajes tienen `"unknown"` en altura o masa. Lo resolví quitando las comas y guardando `null` cuando el valor no es numérico.
+- Hay géneros que no están en el mapeo (`hermaphrodite`, `none`), así que todo lo que no sea `male` o `female` se guarda como `n/a`.
+- El ID 17 está dentro del rango 1–83 pero no existe en SWAPI (404), por lo que tuve que manejarlo con un mensaje claro.
+
+También tuve un problema con el entorno: en Docker sobre Windows cada página tardaba de 8 a 15 segundos porque Laravel lee miles de archivos de `vendor/` desde el disco de Windows. Lo resolví guardando `vendor` y `node_modules` en volúmenes de Docker, y bajó a milisegundos.
 
 ### 6. Uso de Inteligencia Artificial
 Sí. Usé **Claude (Claude Code)** como asistente durante todo el proyecto: configuración de Docker, instalación de Inertia/Vue, y generación del backend (migración, controlador, Form Requests, servicio de SWAPI) y del frontend (páginas y componentes).
 
 Cómo validé el código:
-- Revisé cada archivo para entender qué hace antes de hacer commit.
-- Probé manualmente en el navegador todo el flujo: crear, editar, eliminar, paginación e importación.
-- Probé la importación contra SWAPI real con casos especiales (Luke, Jabba con masa `"1,358"`, C-3PO con género `n/a`, el ID 17 que da 404) y simulé un timeout.
-- Verifiqué las validaciones enviando datos inválidos.
+- Revisé el código archivo por archivo para entender qué hace cada parte.
+- Probé manualmente en el navegador el flujo completo: crear, editar, eliminar, paginación e importación desde SWAPI.
+- Durante el desarrollo, Claude ejecutó pruebas de la importación contra SWAPI real con casos especiales (Luke, Jabba con masa `"1,358"`, C-3PO con género `n/a`, el ID 17 que da 404), simuló un timeout y verificó las validaciones con datos inválidos. Revisé los resultados de esas pruebas.
 
 ### 7. Mejoras futuras
 - Pruebas automatizadas (Feature tests del CRUD y de la importación con `Http::fake()`).
@@ -160,7 +164,13 @@ Cómo validé el código:
 - Cachear la consulta del planeta para no repetirla.
 
 ### 8. Autoevaluación
-[Tu calificación del 1 al 10 y qué consideras lo mejor de tu implementación.]
+8/10. Cumple todo lo obligatorio y funciona sin errores, pero no agregué la mayoría de los bonus (búsqueda, filtros, pruebas automatizadas) y me apoyé bastante en IA.
+
+Lo mejor de la implementación:
+- El manejo de errores de SWAPI: cada caso (timeout, API caída, 404, ID duplicado o fuera de rango) muestra un mensaje claro dentro del modal.
+- La separación de responsabilidades: el controlador es delgado, las validaciones están en Form Requests y la integración con SWAPI en un servicio.
+- `PersonajeForm.vue` se reutiliza para crear y editar cambiando solo sus props.
+- Se levanta completo con un solo `docker compose up --build -d`.
 
 ### 9. Tiempo invertido
-[X horas]
+Aproximadamente 3-4 horas, incluyendo la configuración de Docker, el desarrollo y la revisión del código.
